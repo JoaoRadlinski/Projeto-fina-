@@ -3,10 +3,13 @@ import { TOKEN_KEY } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
 
 const routes = [
+  // ── Redireciona raiz para /feed (guard cuida do auth) ─────────────────────
   {
     path: '/',
-    redirect: '/login',
+    redirect: '/feed',
   },
+
+  // ── Rotas de visitante (AuthLayout) ───────────────────────────────────────
   {
     path: '/',
     component: () => import('@/layouts/AuthLayout.vue'),
@@ -67,12 +70,6 @@ const routes = [
         component: () => import('@/views/PostDetailView.vue'),
       },
     ],
-  },
-
-  // ── Redireciona raiz para /feed ───────────────────────────────────────────
-  {
-    path: '/',
-    redirect: '/feed',
   },
 
   // ── 404 curinga ───────────────────────────────────────────────────────────
