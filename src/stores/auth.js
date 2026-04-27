@@ -1,50 +1,56 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import api, { TOKEN_KEY } from '@/services/api'
+import { TOKEN_KEY } from '@/services/api.js'
+import { authService } from '@/services/auth.service.js'
 
 export const useAuthStore = defineStore('auth', () => {
-  const user  = ref(null)
+  const user = ref(null)
   const token = ref(localStorage.getItem(TOKEN_KEY) ?? null)
 
   const isAuthenticated = computed(() => !!token.value)
 
-  // ── Helpers internos ──────────────────────────────────────────────────────
   function setSession(accessToken, userData) {
     token.value = accessToken
-    user.value  = userData
+    user.value = userData
     localStorage.setItem(TOKEN_KEY, accessToken)
   }
 
   function clearSession() {
     token.value = null
-    user.value  = null
+    user.value = null
     localStorage.removeItem(TOKEN_KEY)
   }
 
-  // ── Actions ───────────────────────────────────────────────────────────────
   async function login(credentials) {
-    const { data } = await api.post('/auth/login', credentials)
+    const { data } = await authService.login(credentials)
     setSession(data.access_token, data.user)
   }
 
   async function register(payload) {
-    const { data } = await api.post('/auth/register', payload)
+    const { data } = await authService.register(payload)
     setSession(data.access_token, data.user)
   }
 
   async function logout() {
     try {
-      await api.post('/auth/logout')
+      await authService.logout()
     } catch {
-      // Ignora erro — pode ser token já expirado
+      // Ignora erro — token pode ja estar expirado
     } finally {
       clearSession()
     }
   }
 
   async function fetchMe() {
-    const { data } = await api.get('/auth/me')
+    const { data } = await authService.me()
     user.value = data
+  }
+
+  // Atualiza campos do usuario no store sem nova requisicao
+  function patchUser(fields) {
+    if (user.value) {
+      user.value = { ...user.value, ...fields }
+    }
   }
 
   return {
@@ -55,5 +61,7 @@ export const useAuthStore = defineStore('auth', () => {
     register,
     logout,
     fetchMe,
+    patchUser,
+    clearSession,
   }
 })
