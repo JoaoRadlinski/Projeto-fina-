@@ -113,8 +113,7 @@ async function handleSave() {
       fd.append('avatar', avatarFile.value)
       await api.post('/users/me/avatar', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
     }
-    await api.put('/users/me', { name: form.name, username: form.username, bio: form.bio })
-    await auth.fetchMe()
+    await auth.updateProfile({ name: form.name, username: form.username, bio: form.bio })
     success.value = true
   } catch (err) {
     const data = err.response?.data

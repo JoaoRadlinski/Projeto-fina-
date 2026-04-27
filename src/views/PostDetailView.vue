@@ -127,6 +127,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
+import { useFeedStore } from '@/stores/feed'
 import { useRelativeTime } from '@/composable/useRelativeTime'
 import AppAvatar from '@/components/shared/AppAvatar.vue'
 import CommentInput from '@/components/feed/CommentInput.vue'
@@ -135,6 +136,7 @@ const route  = useRoute()
 const router = useRouter()
 const auth   = useAuthStore()
 
+const feedStore        = useFeedStore()
 const post             = ref(null)
 const comments         = ref([])
 const loading          = ref(false)
@@ -164,7 +166,14 @@ async function loadPost() {
   error.value   = ''
   try {
     const { data } = await api.get(`/posts/${route.params.postId}`)
-    post.value = data.data ?? data
+    const raw = data?.data ?? data
+    // Normaliza campos que podem variar entre APIs
+    post.value = {
+      ...raw,
+      likes_count:    raw.likes_count    ?? 0,
+      comments_count: raw.comments_count ?? 0,
+      is_liked:       raw.is_liked       ?? false,
+    }
   } catch (err) {
     error.value = err.response?.status === 404 ? 'Post não encontrado.' : 'Erro ao carregar post.'
   } finally {
@@ -176,10 +185,11 @@ async function loadComments(page = 1) {
   commentsLoading.value = true
   try {
     const { data } = await api.get(`/posts/${route.params.postId}/comments`, { params: { page } })
+    const list = (data.data ?? data ?? []).map((c) => c?.data ?? c)
     if (page === 1) {
-      comments.value = data.data ?? data ?? []
+      comments.value = list
     } else {
-      comments.value.push(...(data.data ?? data ?? []))
+      comments.value.push(...list)
     }
     commentsPage.value     = data.current_page ?? page
     commentsLastPage.value = data.last_page ?? 1
@@ -206,8 +216,12 @@ async function handleLike() {
 async function handleAddComment(body) {
   try {
     const { data } = await api.post(`/posts/${route.params.postId}/comments`, { body })
-    comments.value.push(data.data ?? data)
+    const comment = data?.data ?? data
+    comments.value.push(comment)
     if (post.value) post.value.comments_count = (post.value.comments_count ?? 0) + 1
+    // Sincroniza contador no feed store se o post estiver em cache
+    const cached = feedStore.posts[post.value?.id]
+    if (cached) cached.comments_count = post.value.comments_count
   } catch { /* silenciado */ }
 }
 
@@ -225,6 +239,8 @@ async function confirmDeletePost() {
   deleting.value = true
   try {
     await api.delete(`/posts/${post.value.id}`)
+    // Remove do feed store em cache
+    feedStore.deletePost(post.value.id)
     router.push({ name: 'feed' })
   } catch { deleting.value = false }
 }
