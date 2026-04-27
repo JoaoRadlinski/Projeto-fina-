@@ -1,95 +1,63 @@
 :root {
-  /* Cores */
-  --bg:           #fafafa;
-  --surface:      #ffffff;
-  --surface-alt:  #f5f5f5;
-  --border:       #e0e0e0;
-  --text:         #1a1a1a;
-  --text-muted:   #909090;
-  --blue:         #0095f6;
-  --blue-dark:    #0074cc;
-  --red:          #ed4956;
-  --green:        #27ae60;
+  --color-bg:           #fafafa;
+  --color-surface:      #ffffff;
+  --color-surface-alt:  #f0f0f0;
+  --color-border:       #dbdbdb;
+  --color-text:         #262626;
+  --color-text-muted:   #8e8e8e;
+  --color-link:         #00376b;
 
-  /* Gradiente do logo */
-  --grad: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  --color-accent-start: #f09433;
+  --color-accent-mid:   #e6683c;
+  --color-accent-end:   #dc2743;
+  --color-accent:       #e1306c;
 
-  /* Tipografia */
-  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --text-xs:   11px;
-  --text-sm:   13px;
-  --text-base: 14px;
-  --text-md:   16px;
-  --text-lg:   20px;
-  --text-xl:   28px;
+  --color-error:        #ed4956;
+  --color-success:      #2ecc71;
 
-  /* Espaços */
-  --s1:  4px;
-  --s2:  8px;
-  --s3:  12px;
-  --s4:  16px;
-  --s5:  20px;
-  --s6:  24px;
-  --s8:  32px;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-size-xs:   11px;
+  --font-size-sm:   12px;
+  --font-size-base: 14px;
+  --font-size-md:   16px;
+  --font-size-lg:   20px;
+  --font-size-xl:   24px;
 
-  /* Bordas arredondadas */
-  --round-sm:   4px;
-  --round-md:   8px;
-  --round-lg:   16px;
-  --round-full: 9999px;
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
 
-  /* Sombras */
-  --shadow:    0 1px 4px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.10);
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-full: 9999px;
 
-  /* Layout */
-  --nav-height:    49px;
-  --sidebar-width: 244px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
 
-  /* Animações */
-  --fast: 0.15s ease;
-  --base: 0.25s ease;
+  --navbar-height-mobile:  49px;
+  --sidebar-width-desktop: 244px;
+
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s ease;
 }
 
-/* Aliases de compatibilidade com código existente */
-:root {
-  --color-bg:          var(--bg);
-  --color-surface:     var(--surface);
-  --color-surface-alt: var(--surface-alt);
-  --color-border:      var(--border);
-  --color-text:        var(--text);
-  --color-text-muted:  var(--text-muted);
-  --color-error:       var(--red);
-  --color-success:     var(--green);
-  --color-accent:      #e1306c;
-  --font-body:         var(--font);
-  --font-size-xs:      var(--text-xs);
-  --font-size-sm:      var(--text-sm);
-  --font-size-base:    var(--text-base);
-  --font-size-md:      var(--text-md);
-  --font-size-lg:      var(--text-lg);
-  --font-size-xl:      var(--text-xl);
-  --space-1: var(--s1); --space-2: var(--s2); --space-3: var(--s3);
-  --space-4: var(--s4); --space-5: var(--s5); --space-6: var(--s6);
-  --radius-sm:   var(--round-sm);
-  --radius-md:   var(--round-md);
-  --radius-lg:   var(--round-lg);
-  --radius-full: var(--round-full);
-  --shadow-sm:   var(--shadow);
-  --shadow-md:   var(--shadow-md);
-  --navbar-height-mobile:  var(--nav-height);
-  --sidebar-width-desktop: var(--sidebar-width);
-  --transition-fast: var(--fast);
-  --transition-base: var(--base);
-}
-
-/* Reset mínimo */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  width: 100%;
 }
 
 html {
@@ -100,24 +68,10 @@ html {
   -webkit-font-smoothing: antialiased;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+img { display: block; max-width: 100%; }
 
-button {
-  cursor: pointer;
-  border: none;
-  background: none;
-  font-family: inherit;
-}
-
-img {
-  display: block;
-  max-width: 100%;
-}
-
-/* Utilitários mínimos */
 .sr-only {
   position: absolute;
   width: 1px;
