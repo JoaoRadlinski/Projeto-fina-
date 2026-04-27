@@ -25,6 +25,7 @@
         <button
           class="post-card__action-btn"
           :class="{ 'post-card__action-btn--liked': post.is_liked }"
+          :disabled="feedStore.isLikePending(post.id)"
           @click="handleLike"
           :aria-label="post.is_liked ? 'Descurtir' : 'Curtir'"
         >

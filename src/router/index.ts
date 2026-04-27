@@ -40,6 +40,11 @@ const routes = [
         component: () => import('@/views/FeedView.vue'),
       },
       {
+        path: 'descobrir',
+        name: 'descobrir',
+        component: () => import('@/views/DiscoverView.vue'),
+      },
+      {
         path: 'criar',
         name: 'criar',
         component: () => import('@/views/CreatePostView.vue'),

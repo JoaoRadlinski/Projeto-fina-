@@ -47,6 +47,7 @@
               <button
                 class="post-detail__action-btn"
                 :class="{ 'post-detail__action-btn--liked': post.is_liked }"
+                :disabled="likePending"
                 @click="handleLike"
               >
                 <svg width="22" height="22" viewBox="0 0 24 24"
@@ -146,9 +147,10 @@ const commentsLoading  = ref(false)
 const commentsPage     = ref(1)
 const commentsLastPage = ref(1)
 
-const isAuthor      = computed(() => auth.user?.id === post.value?.user?.id)
+const isAuthor       = computed(() => auth.user?.id === post.value?.user?.id)
 const commentsHasMore = computed(() => commentsPage.value < commentsLastPage.value)
-const relativeTime  = computed(() => useRelativeTime(post.value?.created_at))
+const relativeTime   = computed(() => useRelativeTime(post.value?.created_at))
+const likePending    = ref(false)
 const authorLink    = computed(() => {
   const u = post.value?.user?.username
   return u ? `/perfil?user=${u}` : '/perfil'
@@ -200,7 +202,8 @@ async function loadComments(page = 1) {
 function loadMoreComments() { loadComments(commentsPage.value + 1) }
 
 async function handleLike() {
-  if (!post.value) return
+  if (!post.value || likePending.value) return
+  likePending.value  = true
   const wasLiked = post.value.is_liked
   post.value.is_liked    = !wasLiked
   post.value.likes_count += wasLiked ? -1 : 1
@@ -210,6 +213,8 @@ async function handleLike() {
   } catch {
     post.value.is_liked    = wasLiked
     post.value.likes_count += wasLiked ? 1 : -1
+  } finally {
+    likePending.value = false
   }
 }
 

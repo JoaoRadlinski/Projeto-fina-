@@ -8,11 +8,12 @@ function normalizeList(data) {
 }
 
 export const useFeedStore = defineStore('feed', () => {
-  const posts      = ref({})      // dicionário id → post
-  const orderedIds = ref([])      // ids na ordem do feed
-  const nextCursor = ref(null)    // cursor para próxima página
-  const loading    = ref(false)
-  const error      = ref('')
+  const posts       = ref({})      // dicionário id → post
+  const orderedIds  = ref([])      // ids na ordem do feed
+  const nextCursor  = ref(null)    // cursor para próxima página
+  const loading     = ref(false)
+  const error       = ref('')
+  const pendingLikes = ref(new Set()) // ids de posts com like em andamento
 
   const orderedPosts = computed(() =>
     orderedIds.value.map((id) => posts.value[id]).filter(Boolean)
@@ -68,12 +69,15 @@ export const useFeedStore = defineStore('feed', () => {
   }
 
   async function toggleLike(postId) {
+    // Impede requisição duplicada enquanto uma já está em andamento
+    if (pendingLikes.value.has(postId)) return
     const post = posts.value[postId]
     if (!post) return
     const wasLiked   = post.is_liked
     // Atualização otimista
     post.is_liked    = !wasLiked
     post.likes_count = (post.likes_count ?? 0) + (wasLiked ? -1 : 1)
+    pendingLikes.value = new Set([...pendingLikes.value, postId])
     try {
       if (wasLiked) {
         await api.delete(`/posts/${postId}/unlike`)
@@ -86,7 +90,13 @@ export const useFeedStore = defineStore('feed', () => {
       // Reverte em caso de erro
       post.is_liked    = wasLiked
       post.likes_count = (post.likes_count ?? 0) + (wasLiked ? 1 : -1)
+    } finally {
+      pendingLikes.value = new Set([...pendingLikes.value].filter((id) => id !== postId))
     }
+  }
+
+  function isLikePending(postId) {
+    return pendingLikes.value.has(postId)
   }
 
   async function addComment(postId, body) {
@@ -124,6 +134,7 @@ export const useFeedStore = defineStore('feed', () => {
     fetchFeed,
     loadMoreFeed,
     toggleLike,
+    isLikePending,
     addComment,
     createPost,
     deletePost,

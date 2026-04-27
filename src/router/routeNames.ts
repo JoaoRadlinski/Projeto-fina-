@@ -3,6 +3,7 @@ export const ROUTE_NAMES = {
   LOGIN:               'login',
   REGISTER:            'cadastro',
   FEED:                'feed',
+  DISCOVER:            'descobrir',
   CREATE_POST:         'criar',
   POST_DETAILS:        'post-detalhe',
   PROFILE:             'perfil',

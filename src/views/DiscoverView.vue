@@ -4,63 +4,144 @@
     <div class="busca">
       <div class="campo-busca">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <circle cx="11" cy="11" r="8"/>
-          <path d="M21 21l-4.35-4.35"/>
+          <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
         </svg>
         <input
           v-model="termo"
           type="text"
-          placeholder="Buscar pessoas ou conteudo..."
+          placeholder="Buscar pessoas..."
           @input="buscar"
+        />
+        <button v-if="termo" class="campo-busca__clear" @click="limparBusca">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Resultados da busca -->
+    <div v-if="termo" class="secao">
+      <div v-if="buscando" class="estado-vazio">
+        <div class="spinner"></div>
+      </div>
+      <div v-else-if="resultadosBusca.length === 0" class="estado-vazio">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+        </svg>
+        <p>Nenhum usuário encontrado para "{{ termo }}"</p>
+      </div>
+      <div v-else class="lista-usuarios">
+        <UserCard
+          v-for="user in resultadosBusca"
+          :key="user.id"
+          :user="user"
+          :is-following="followingIds.has(user.id)"
         />
       </div>
     </div>
 
-    <!-- Grade de fotos -->
-    <div class="grade">
-      <div
-        v-for="foto in fotos"
-        :key="foto.id"
-        class="foto-item"
-        :class="{ 'foto-destaque': foto.destaque }"
-      >
-        <img :src="foto.url" :alt="foto.alt" />
-        <div class="foto-hover">
-          <span>{{ foto.curtidas }} curtidas</span>
-        </div>
+    <!-- Sugestões para seguir -->
+    <div v-else class="secao">
+      <h2 class="secao__titulo">Sugestões para você</h2>
+
+      <div v-if="carregandoSugestoes" class="estado-vazio">
+        <div class="spinner"></div>
+      </div>
+
+      <div v-else-if="sugestoes.length === 0" class="estado-vazio">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+        <p>Nenhuma sugestão no momento</p>
+      </div>
+
+      <div v-else class="lista-usuarios">
+        <UserCard
+          v-for="user in sugestoes"
+          :key="user.id"
+          :user="user"
+          :is-following="followingIds.has(user.id)"
+          @follow-toggled="onFollowToggled"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import api from '@/services/api'
+import { useAuthStore } from '@/stores/auth'
+import UserCard from '@/components/discover/UserCard.vue'
 
-const termo = ref('')
+const auth = useAuthStore()
 
-const fotos = ref([
-  { id: 1,  url: 'https://picsum.photos/seed/d1/300/300',  alt: 'foto 1',  curtidas: 842,  destaque: true  },
-  { id: 2,  url: 'https://picsum.photos/seed/d2/300/300',  alt: 'foto 2',  curtidas: 321,  destaque: false },
-  { id: 3,  url: 'https://picsum.photos/seed/d3/300/300',  alt: 'foto 3',  curtidas: 654,  destaque: false },
-  { id: 4,  url: 'https://picsum.photos/seed/d4/300/300',  alt: 'foto 4',  curtidas: 198,  destaque: false },
-  { id: 5,  url: 'https://picsum.photos/seed/d5/300/300',  alt: 'foto 5',  curtidas: 1032, destaque: false },
-  { id: 6,  url: 'https://picsum.photos/seed/d6/300/300',  alt: 'foto 6',  curtidas: 477,  destaque: false },
-  { id: 7,  url: 'https://picsum.photos/seed/d7/300/300',  alt: 'foto 7',  curtidas: 234,  destaque: false },
-  { id: 8,  url: 'https://picsum.photos/seed/d8/300/300',  alt: 'foto 8',  curtidas: 889,  destaque: false },
-  { id: 9,  url: 'https://picsum.photos/seed/d9/300/300',  alt: 'foto 9',  curtidas: 567,  destaque: false },
-  { id: 10, url: 'https://picsum.photos/seed/d10/300/300', alt: 'foto 10', curtidas: 312,  destaque: false },
-  { id: 11, url: 'https://picsum.photos/seed/d11/300/300', alt: 'foto 11', curtidas: 743,  destaque: false },
-  { id: 12, url: 'https://picsum.photos/seed/d12/300/300', alt: 'foto 12', curtidas: 128,  destaque: false },
-])
+const termo             = ref('')
+const sugestoes         = ref([])
+const resultadosBusca   = ref([])
+const followingIds      = ref(new Set())
+const carregandoSugestoes = ref(false)
+const buscando          = ref(false)
+let   buscaTimeout      = null
+
+async function carregarSugestoes() {
+  carregandoSugestoes.value = true
+  try {
+    const { data } = await api.get('/users/suggestions')
+    sugestoes.value = data.data ?? data ?? []
+  } catch {
+    sugestoes.value = []
+  } finally {
+    carregandoSugestoes.value = false
+  }
+}
+
+async function carregarMeusSeguindo() {
+  if (!auth.user) return
+  try {
+    const { data } = await api.get(`/users/${auth.user.id}/following`)
+    followingIds.value = new Set((data.data ?? data ?? []).map((u) => u.id))
+  } catch { /* silenciado */ }
+}
 
 function buscar() {
-  // integrar com api quando disponivel
+  clearTimeout(buscaTimeout)
+  if (!termo.value.trim()) {
+    resultadosBusca.value = []
+    return
+  }
+  buscando.value = true
+  buscaTimeout = setTimeout(async () => {
+    try {
+      const { data } = await api.get('/users/search', { params: { q: termo.value.trim() } })
+      resultadosBusca.value = (data.data ?? data ?? []).filter((u) => u.id !== auth.user?.id)
+    } catch {
+      resultadosBusca.value = []
+    } finally {
+      buscando.value = false
+    }
+  }, 400)
 }
+
+function limparBusca() {
+  termo.value = ''
+  resultadosBusca.value = []
+}
+
+function onFollowToggled(userId, isNowFollowing) {
+  if (isNowFollowing) followingIds.value = new Set([...followingIds.value, userId])
+  else                followingIds.value = new Set([...followingIds.value].filter((id) => id !== userId))
+}
+
+onMounted(async () => {
+  await Promise.all([carregarSugestoes(), carregarMeusSeguindo()])
+})
 </script>
 
 <style scoped>
 .pagina {
-  max-width: 935px;
+  max-width: 600px;
   margin: 0 auto;
 }
 
@@ -69,92 +150,96 @@ function buscar() {
   padding: 16px;
   position: sticky;
   top: 0;
-  background: var(--bg);
+  background: var(--color-bg);
   z-index: 10;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .campo-busca {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--surface-alt);
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
+  background: var(--color-surface-alt);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
   padding: 10px 14px;
-  transition: border-color 0.15s ease;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
 }
 
 .campo-busca:focus-within {
-  border-color: var(--blue);
-  background: white;
+  border-color: var(--color-accent);
+  background: var(--color-surface);
 }
 
 .campo-busca svg {
-  color: var(--text-muted);
+  color: var(--color-text-muted);
   flex-shrink: 0;
 }
 
 .campo-busca input {
+  flex: 1;
   border: none;
   background: none;
   outline: none;
   font-size: 14px;
-  color: var(--text);
-  width: 100%;
+  color: var(--color-text);
 }
 
-.campo-busca input::placeholder {
-  color: var(--text-muted);
-}
+.campo-busca input::placeholder { color: var(--color-text-muted); }
 
-/* Grade de fotos */
-.grade {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 3px;
-  padding: 3px;
-}
-
-.foto-item {
-  position: relative;
-  aspect-ratio: 1;
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.foto-destaque {
-  grid-column: span 2;
-  grid-row: span 2;
-}
-
-.foto-item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform 0.3s ease;
-}
-
-.foto-item:hover img {
-  transform: scale(1.04);
-}
-
-.foto-hover {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.35);
+.campo-busca__clear {
   display: flex;
   align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 50%;
+  transition: color var(--transition-fast);
+}
+.campo-busca__clear:hover { color: var(--color-text); }
+
+/* Seção */
+.secao {
+  padding: 16px;
 }
 
-.foto-item:hover .foto-hover {
-  opacity: 1;
+.secao__titulo {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--color-text);
 }
+
+/* Lista de usuários */
+.lista-usuarios {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Estado vazio / loading */
+.estado-vazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 24px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Spinner */
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 2.5px solid var(--color-border);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
