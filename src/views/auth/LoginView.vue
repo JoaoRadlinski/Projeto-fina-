@@ -1,141 +1,187 @@
 <template>
-  <div class="auth-form">
-    <h1 class="auth-form__logo">InstaClone</h1>
+  <div class="card">
+    <!-- Logo -->
+    <h1 class="logo">Lumeo</h1>
+    <p class="slogan">Entre para ver o que está acontecendo.</p>
 
-    <form @submit.prevent="handleLogin">
-      <div class="auth-form__field">
+    <!-- Formulário -->
+    <form @submit.prevent="entrar">
+      <div class="campo">
+        <label for="email">E-mail</label>
         <input
-          v-model="form.email"
+          id="email"
+          v-model="email"
           type="email"
-          placeholder="Email"
+          placeholder="seu@email.com"
           autocomplete="email"
-          :disabled="loading"
+          :disabled="carregando"
           required
         />
       </div>
 
-      <div class="auth-form__field">
+      <div class="campo">
+        <label for="senha">Senha</label>
         <input
-          v-model="form.password"
+          id="senha"
+          v-model="senha"
           type="password"
-          placeholder="Senha"
+          placeholder="Sua senha"
           autocomplete="current-password"
-          :disabled="loading"
+          :disabled="carregando"
           required
         />
       </div>
 
-      <p v-if="error" class="auth-form__error">{{ error }}</p>
+      <p v-if="erro" class="mensagem-erro">{{ erro }}</p>
 
-      <button type="submit" class="auth-form__btn" :disabled="loading">
-        {{ loading ? 'Entrando...' : 'Entrar' }}
+      <button type="submit" class="botao-entrar" :disabled="carregando">
+        {{ carregando ? 'Entrando...' : 'Entrar' }}
       </button>
     </form>
 
-    <div class="auth-form__footer">
+    <!-- Rodapé -->
+    <p class="rodape">
       Não tem uma conta?
-      <RouterLink to="/cadastro">Cadastre-se</RouterLink>
-    </div>
+      <RouterLink to="/register">Cadastre-se</RouterLink>
+    </p>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth.js'
+import { extractErrorMessage } from '@/services/api.js'
+import { ROUTE_NAMES } from '@/router/routeNames.js'
 
 const router = useRouter()
-const auth   = useAuthStore()
+const auth = useAuthStore()
 
-const loading = ref(false)
-const error   = ref('')
-const form    = reactive({ email: '', password: '' })
+const email = ref('')
+const senha = ref('')
+const carregando = ref(false)
+const erro = ref('')
 
-async function handleLogin() {
-  error.value   = ''
-  loading.value = true
+async function entrar() {
+  erro.value = ''
+  carregando.value = true
   try {
-    await auth.login(form)
-    router.push({ name: 'feed' })
+    await auth.login({ email: email.value, password: senha.value })
+    router.push({ name: ROUTE_NAMES.FEED })
   } catch (err) {
-    error.value = err.response?.data?.message ?? 'Erro ao entrar. Tente novamente.'
+    erro.value = extractErrorMessage(err, 'E-mail ou senha incorretos. Tente novamente.')
   } finally {
-    loading.value = false
+    carregando.value = false
   }
 }
 </script>
 
 <style scoped>
-.auth-form {
+.card {
   width: 100%;
-  max-width: 350px;
-  margin: 0 auto;
-  padding: var(--space-6);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  padding: 40px 32px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
-.auth-form__logo {
-  font-size: var(--font-size-xl);
+.logo {
+  font-size: 36px;
   font-family: 'Billabong', 'Grand Hotel', cursive;
   text-align: center;
-  margin-bottom: var(--space-6);
-  letter-spacing: 1px;
+  margin-bottom: 8px;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.auth-form__field {
-  margin-bottom: var(--space-3);
-}
-
-.auth-form__field input {
-  width: 100%;
-  padding: 9px var(--space-3);
-  background: var(--color-surface-alt);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-sm);
-  outline: none;
-  transition: border-color var(--transition-fast);
-}
-
-.auth-form__field input:focus {
-  border-color: #a8a8a8;
-}
-
-.auth-form__error {
-  font-size: var(--font-size-sm);
-  color: var(--color-error);
+.slogan {
+  font-size: 14px;
+  color: var(--text-muted);
   text-align: center;
-  margin-bottom: var(--space-3);
+  margin-bottom: 24px;
+  line-height: 1.4;
 }
 
-.auth-form__btn {
+.campo {
+  margin-bottom: 14px;
+}
+
+.campo label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 5px;
+}
+
+.campo input {
   width: 100%;
-  padding: var(--space-2) 0;
-  background: #0095f6;
-  color: #fff;
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  border-radius: var(--radius-sm);
-  opacity: 1;
-  transition: opacity var(--transition-fast);
+  padding: 10px 12px;
+  background: var(--surface-alt);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.auth-form__btn:disabled {
+.campo input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(0, 149, 246, 0.12);
+  background: white;
+}
+
+.mensagem-erro {
+  font-size: 13px;
+  color: var(--red);
+  text-align: center;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: #fff0f0;
+  border-radius: 8px;
+}
+
+.botao-entrar {
+  width: 100%;
+  padding: 11px 0;
+  background: var(--blue);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+  margin-top: 4px;
+}
+
+.botao-entrar:hover:not(:disabled) {
+  background: var(--blue-dark);
+}
+
+.botao-entrar:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.auth-form__footer {
-  margin-top: var(--space-4);
-  font-size: var(--font-size-sm);
+.rodape {
+  margin-top: 20px;
+  font-size: 13px;
   text-align: center;
-  color: var(--color-text-muted);
+  color: var(--text-muted);
 }
 
-.auth-form__footer a {
-  color: #0095f6;
+.rodape a {
+  color: var(--blue);
   font-weight: 600;
+  text-decoration: none;
+}
+
+.rodape a:hover {
+  text-decoration: underline;
 }
 </style>
