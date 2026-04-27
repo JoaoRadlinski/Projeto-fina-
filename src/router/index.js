@@ -1,15 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { TOKEN_KEY } from '@/services/api.js'
-import { useAuthStore } from '@/stores/auth.js'
-import { ROUTE_NAMES } from './routeNames.js'
+import { TOKEN_KEY } from '@/services/api'
+import { useAuthStore } from '@/stores/auth'
 
 const routes = [
+  // ── Redireciona raiz para /feed ───────────────────────────────────────
   {
     path: '/',
-    redirect: '/login',
+    redirect: '/feed',
   },
 
-  // Rotas publicas (AuthLayout)
+  // ── Rotas de visitante (AuthLayout) ───────────────────────────────────
   {
     path: '/',
     component: () => import('@/layouts/AuthLayout.vue'),
@@ -17,18 +17,18 @@ const routes = [
     children: [
       {
         path: 'login',
-        name: ROUTE_NAMES.LOGIN,
+        name: 'login',
         component: () => import('@/views/auth/LoginView.vue'),
       },
       {
-        path: 'register',
-        name: ROUTE_NAMES.REGISTER,
+        path: 'cadastro',
+        name: 'cadastro',
         component: () => import('@/views/auth/RegisterView.vue'),
       },
     ],
   },
 
-  // Rotas autenticadas (AppLayout)
+  // ── Rotas autenticadas (AppLayout) ────────────────────────────────────
   {
     path: '/',
     component: () => import('@/layouts/AppLayout.vue'),
@@ -36,52 +36,41 @@ const routes = [
     children: [
       {
         path: 'feed',
-        name: ROUTE_NAMES.FEED,
-        meta: { navItem: 'feed' },
+        name: 'feed',
         component: () => import('@/views/FeedView.vue'),
       },
       {
-        path: 'discover',
-        name: ROUTE_NAMES.DISCOVER,
-        meta: { navItem: 'discover' },
-        component: () => import('@/views/DiscoverView.vue'),
-      },
-      {
-        path: 'create',
-        name: ROUTE_NAMES.CREATE_POST,
-        meta: { navItem: 'create' },
+        path: 'criar',
+        name: 'criar',
         component: () => import('@/views/CreatePostView.vue'),
       },
       {
-        path: 'profile',
-        name: ROUTE_NAMES.PROFILE,
-        meta: { navItem: 'profile' },
+        path: 'perfil',
+        name: 'perfil',
         component: () => import('@/views/ProfileView.vue'),
       },
       {
-        path: 'profile/edit',
-        name: ROUTE_NAMES.EDIT_PROFILE,
-        meta: { navItem: 'profile' },
+        path: 'perfil/editar',
+        name: 'perfil-editar',
         component: () => import('@/views/EditProfileView.vue'),
       },
       {
-        path: 'profile/list/:type',
-        name: ROUTE_NAMES.PROFILE_CONNECTIONS,
-        meta: { navItem: 'profile' },
+        path: 'perfil/lista/:type',
+        name: 'perfil-lista',
         component: () => import('@/views/ConnectionListView.vue'),
       },
       {
         path: 'posts/:postId',
-        name: ROUTE_NAMES.POST_DETAILS,
+        name: 'post-detalhe',
         component: () => import('@/views/PostDetailView.vue'),
       },
     ],
   },
 
-  // 404
+  // ── 404 curinga ───────────────────────────────────────────────────────
   {
     path: '/:pathMatch(.*)*',
-    name: ROUTE_NAMES.NOT_FOUND,
+    name: 'not-found',
     component: () => import('@/views/NotFoundView.vue'),
   },
 ]
@@ -91,16 +80,16 @@ const router = createRouter({
   routes,
 })
 
-// Guard global — hidrata sessao e controla acesso
+// ── Guards globais ────────────────────────────────────────────────────────
 router.beforeEach(async (to) => {
   const hasToken = !!localStorage.getItem(TOKEN_KEY)
 
   if (to.meta.requiresAuth && !hasToken) {
-    return { name: ROUTE_NAMES.LOGIN }
+    return { name: 'login' }
   }
 
   if (to.meta.requiresGuest && hasToken) {
-    return { name: ROUTE_NAMES.FEED }
+    return { name: 'feed' }
   }
 
   if (hasToken) {
@@ -109,7 +98,7 @@ router.beforeEach(async (to) => {
       try {
         await auth.fetchMe()
       } catch {
-        return { name: ROUTE_NAMES.LOGIN }
+        return { name: 'login' }
       }
     }
   }
