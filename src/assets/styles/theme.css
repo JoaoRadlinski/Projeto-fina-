@@ -1,7 +1,10 @@
+/* ═══════════════════════════════════════════════════════════════
+   TEMA CLARO (padrão)
+═══════════════════════════════════════════════════════════════ */
 :root {
   --color-bg:           #fafafa;
   --color-surface:      #ffffff;
-  --color-surface-alt:  #f0f0f0;
+  --color-surface-alt:  #efefef;
   --color-border:       #dbdbdb;
   --color-text:         #262626;
   --color-text-muted:   #8e8e8e;
@@ -10,7 +13,8 @@
   --color-accent-start: #f09433;
   --color-accent-mid:   #e6683c;
   --color-accent-end:   #dc2743;
-  --color-accent:       #e1306c;
+  --color-accent:       #0095f6;   /* azul Instagram para botões de ação */
+  --color-like:         #ed4956;   /* vermelho para o coração curtido */
 
   --color-error:        #ed4956;
   --color-success:      #2ecc71;
@@ -45,6 +49,25 @@
   --transition-base: 0.25s ease;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   TEMA ESCURO  (Instagram dark)
+═══════════════════════════════════════════════════════════════ */
+[data-theme="dark"] {
+  --color-bg:          #000000;
+  --color-surface:     #000000;
+  --color-surface-alt: #1a1a1a;
+  --color-border:      #363636;
+  --color-text:        #f5f5f5;
+  --color-text-muted:  #a8a8a8;
+  --color-link:        #e0f1ff;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════════════════════ */
 *,
 *::before,
 *::after {
@@ -66,6 +89,8 @@ html {
   color: var(--color-text);
   background-color: var(--color-bg);
   -webkit-font-smoothing: antialiased;
+  /* Transição suave ao trocar de tema */
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 a { color: inherit; text-decoration: none; }

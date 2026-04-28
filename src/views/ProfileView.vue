@@ -29,8 +29,8 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import api from '@/services/api'
-import { useAuthStore } from '@/stores/auth'
+import api from '@/services/api.js'
+import { useAuthStore } from '@/stores/auth.js'
 import ProfileHeader from '@/components/profile/ProfileHeader.vue'
 import PostGrid from '@/components/profile/PostGrid.vue'
 
