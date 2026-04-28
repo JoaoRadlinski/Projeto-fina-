@@ -22,12 +22,12 @@ export function useImageUpload() {
     if (!file) return
 
     if (!TIPOS_ACEITOS.includes(file.type)) {
-      erro.value = 'Formato invalido. Use JPG, PNG ou WEBP.'
+      erro.value = 'Formato inválido. Use JPG, PNG ou WebP.'
       return
     }
 
     if (file.size > TAMANHO_MAX_BYTES) {
-      erro.value = `A imagem deve ter no maximo ${TAMANHO_MAX_MB} MB.`
+      erro.value = `A imagem deve ter no máximo ${TAMANHO_MAX_MB} MB.`
       return
     }
 
