@@ -1,7 +1,7 @@
 export function useRelativeTime(dateInput) {
   if (!dateInput) return ''
-  const date    = typeof dateInput === 'string' ? new Date(dateInput) : dateInput
-  const diffMs  = Date.now() - date.getTime()
+  const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput
+  const diffMs = Date.now() - date.getTime()
   if (diffMs < 0) return 'agora'
   const seconds = Math.floor(diffMs / 1000)
   const minutes = Math.floor(seconds / 60)

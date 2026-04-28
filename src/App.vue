@@ -1,8 +1,7 @@
 <script setup>
 import { onMounted } from 'vue'
 
-// Inicializa o tema ao carregar o app.
-// Prioridade: localStorage → preferência do sistema → claro
+
 onMounted(() => {
   const saved = localStorage.getItem('instaclone.theme')
   if (saved === 'dark' || saved === 'light') {

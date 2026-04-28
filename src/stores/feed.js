@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import api from '@/services/api'
 
-// Normaliza a lista de posts independente do formato da API
 function normalizeList(data) {
   return data?.data ?? data?.items ?? (Array.isArray(data) ? data : [])
 }

@@ -6,15 +6,12 @@ export const postsService = {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
   },
-
   getById(postId) {
     return api.get(`/posts/${postId}`)
   },
-
   update(postId, payload) {
     return api.put(`/posts/${postId}`, payload)
   },
-
   delete(postId) {
     return api.delete(`/posts/${postId}`)
   },

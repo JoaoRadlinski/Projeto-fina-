@@ -1,6 +1,7 @@
 <template>
   <div class="post-detail">
     <div class="post-detail__container">
+
       <div v-if="loading" class="post-detail__loader">
         <div class="spinner"></div>
       </div>
@@ -12,7 +13,8 @@
 
       <template v-else-if="post">
         <article class="post-detail__card">
-          <!-- Header -->
+
+
           <header class="post-detail__header">
             <RouterLink :to="authorLink" class="post-detail__author">
               <AppAvatar :src="post.user?.avatar_url" :name="post.user?.name" size="md" />
@@ -24,24 +26,26 @@
             <button
               v-if="isAuthor"
               class="post-detail__delete-btn"
-              @click="confirmDeletePost"
               :disabled="deleting"
+              @click="confirmDeletePost"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="3 6 5 6 21 6"/>
-                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                <path d="M10 11v6"/><path d="M14 11v6"/>
-                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                <path d="M10 11v6" />
+                <path d="M14 11v6" />
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
               </svg>
             </button>
           </header>
 
-          <!-- Imagem -->
+
           <div class="post-detail__image-wrapper">
             <img :src="post.image_url" :alt="post.caption || 'Post'" class="post-detail__image" />
           </div>
 
-          <!-- Ações + info -->
+
           <div class="post-detail__body">
             <div class="post-detail__actions">
               <button
@@ -50,11 +54,13 @@
                 :disabled="likePending"
                 @click="handleLike"
               >
-                <svg width="22" height="22" viewBox="0 0 24 24"
+                <svg
+                  width="22" height="22" viewBox="0 0 24 24"
                   :fill="post.is_liked ? '#ed4956' : 'none'"
                   :stroke="post.is_liked ? '#ed4956' : 'currentColor'"
-                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                >
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                 </svg>
               </button>
             </div>
@@ -64,7 +70,9 @@
             </p>
 
             <p v-if="post.caption" class="post-detail__caption">
-              <RouterLink :to="authorLink" class="post-detail__caption-author">{{ post.user?.username }}</RouterLink>
+              <RouterLink :to="authorLink" class="post-detail__caption-author">
+                {{ post.user?.username }}
+              </RouterLink>
               {{ post.caption }}
             </p>
 
@@ -72,7 +80,7 @@
           </div>
         </article>
 
-        <!-- Comentários -->
+
         <section class="post-detail__comments">
           <h2 class="post-detail__comments-title">
             Comentários ({{ post.comments_count ?? 0 }})
@@ -119,6 +127,7 @@
           </div>
         </section>
       </template>
+
     </div>
   </div>
 </template>
@@ -133,48 +142,53 @@ import { useRelativeTime } from '@/composable/useRelativeTime'
 import AppAvatar from '@/components/shared/AppAvatar.vue'
 import CommentInput from '@/components/feed/CommentInput.vue'
 
-const route  = useRoute()
+const route = useRoute()
 const router = useRouter()
-const auth   = useAuthStore()
+const auth = useAuthStore()
+const feedStore = useFeedStore()
 
-const feedStore        = useFeedStore()
-const post             = ref(null)
-const comments         = ref([])
-const loading          = ref(false)
-const error            = ref('')
-const deleting         = ref(false)
-const commentsLoading  = ref(false)
-const commentsPage     = ref(1)
+const post = ref(null)
+const comments = ref([])
+const loading = ref(false)
+const error = ref('')
+const deleting = ref(false)
+const likePending = ref(false)
+const commentsLoading = ref(false)
+const commentsPage = ref(1)
 const commentsLastPage = ref(1)
 
-const isAuthor       = computed(() => auth.user?.id === post.value?.user?.id)
+const isAuthor = computed(() => auth.user?.id === post.value?.user?.id)
 const commentsHasMore = computed(() => commentsPage.value < commentsLastPage.value)
-const relativeTime   = computed(() => useRelativeTime(post.value?.created_at))
-const likePending    = ref(false)
-const authorLink    = computed(() => {
-  const u = post.value?.user?.username
-  return u ? `/perfil?user=${u}` : '/perfil'
+const relativeTime = computed(() => useRelativeTime(post.value?.created_at))
+const authorLink = computed(() => {
+  const username = post.value?.user?.username
+  return username ? `/perfil?user=${username}` : '/perfil'
 })
 
-function formatTime(d)         { return useRelativeTime(d) }
-function isCommentAuthor(c)    { return auth.user?.id === c.user?.id }
-function getProfileLink(user)  {
+function formatTime(date) {
+  return useRelativeTime(date)
+}
+
+function isCommentAuthor(comment) {
+  return auth.user?.id === comment.user?.id
+}
+
+function getProfileLink(user) {
   if (!user) return '/perfil'
   return auth.user?.id === user.id ? '/perfil' : `/perfil?user=${user.username}`
 }
 
 async function loadPost() {
   loading.value = true
-  error.value   = ''
+  error.value = ''
   try {
     const { data } = await api.get(`/posts/${route.params.postId}`)
     const raw = data?.data ?? data
-    // Normaliza campos que podem variar entre APIs
     post.value = {
       ...raw,
-      likes_count:    raw.likes_count    ?? 0,
+      likes_count: raw.likes_count ?? 0,
       comments_count: raw.comments_count ?? 0,
-      is_liked:       raw.is_liked       ?? false,
+      is_liked: raw.is_liked ?? false,
     }
   } catch (err) {
     error.value = err.response?.status === 404 ? 'Post não encontrado.' : 'Erro ao carregar post.'
@@ -193,25 +207,32 @@ async function loadComments(page = 1) {
     } else {
       comments.value.push(...list)
     }
-    commentsPage.value     = data.current_page ?? page
+    commentsPage.value = data.current_page ?? page
     commentsLastPage.value = data.last_page ?? 1
-  } catch { /* silenciado */ }
-  finally { commentsLoading.value = false }
+  } catch {  }
+  finally {
+    commentsLoading.value = false
+  }
 }
 
-function loadMoreComments() { loadComments(commentsPage.value + 1) }
+function loadMoreComments() {
+  loadComments(commentsPage.value + 1)
+}
 
 async function handleLike() {
   if (!post.value || likePending.value) return
-  likePending.value  = true
+  likePending.value = true
   const wasLiked = post.value.is_liked
-  post.value.is_liked    = !wasLiked
+  post.value.is_liked = !wasLiked
   post.value.likes_count += wasLiked ? -1 : 1
   try {
-    if (wasLiked) { await api.delete(`/posts/${post.value.id}/unlike`) }
-    else          { await api.post(`/posts/${post.value.id}/like`) }
+    if (wasLiked) {
+      await api.delete(`/posts/${post.value.id}/unlike`)
+    } else {
+      await api.post(`/posts/${post.value.id}/like`)
+    }
   } catch {
-    post.value.is_liked    = wasLiked
+    post.value.is_liked = wasLiked
     post.value.likes_count += wasLiked ? 1 : -1
   } finally {
     likePending.value = false
@@ -224,10 +245,10 @@ async function handleAddComment(body) {
     const comment = data?.data ?? data
     comments.value.push(comment)
     if (post.value) post.value.comments_count = (post.value.comments_count ?? 0) + 1
-    // Sincroniza contador no feed store se o post estiver em cache
+
     const cached = feedStore.posts[post.value?.id]
     if (cached) cached.comments_count = post.value.comments_count
-  } catch { /* silenciado */ }
+  } catch {  }
 }
 
 async function deleteComment(commentId) {
@@ -236,7 +257,7 @@ async function deleteComment(commentId) {
     await api.delete(`/comments/${commentId}`)
     comments.value = comments.value.filter((c) => c.id !== commentId)
     if (post.value) post.value.comments_count = Math.max(0, (post.value.comments_count ?? 1) - 1)
-  } catch { /* silenciado */ }
+  } catch {  }
 }
 
 async function confirmDeletePost() {
@@ -244,10 +265,11 @@ async function confirmDeletePost() {
   deleting.value = true
   try {
     await api.delete(`/posts/${post.value.id}`)
-    // Remove do feed store em cache
     feedStore.deletePost(post.value.id)
     router.push({ name: 'feed' })
-  } catch { deleting.value = false }
+  } catch {
+    deleting.value = false
+  }
 }
 
 onMounted(async () => {
@@ -257,52 +279,291 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.post-detail { padding: 20px 16px; }
-.post-detail__container { max-width: 600px; margin: 0 auto; }
-.post-detail__loader { display: flex; justify-content: center; padding: 80px 0; }
-.spinner { width: 32px; height: 32px; border: 3px solid var(--color-border); border-top-color: var(--color-accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
-.spinner--sm { width: 18px; height: 18px; border-width: 2px; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.post-detail__error { text-align: center; padding: 80px 24px; color: var(--color-text-muted); }
-.post-detail__back-link { display: inline-block; margin-top: 12px; color: var(--color-accent); font-weight: 600; text-decoration: none; }
+.post-detail {
+  padding: 20px 16px;
+}
 
-.post-detail__card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden; }
-.post-detail__header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; }
-.post-detail__author { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
-.post-detail__author-info { display: flex; flex-direction: column; }
-.post-detail__author-name { font-size: 14px; font-weight: 600; }
-.post-detail__author-username { font-size: 12px; color: var(--color-text-muted); }
-.post-detail__delete-btn { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; color: var(--color-text-muted); background: none; border: none; cursor: pointer; transition: all var(--transition-fast); }
-.post-detail__delete-btn:hover { color: var(--color-error); background: rgba(237,73,86,0.08); }
-.post-detail__image-wrapper { width: 100%; background: var(--color-surface-alt); }
-.post-detail__image { width: 100%; display: block; object-fit: cover; }
-.post-detail__body { padding: 14px 16px; }
-.post-detail__actions { display: flex; gap: 12px; margin-bottom: 8px; }
-.post-detail__action-btn { display: flex; align-items: center; color: var(--color-text); background: none; border: none; cursor: pointer; padding: 2px; transition: transform var(--transition-fast); }
-.post-detail__action-btn:hover { transform: scale(1.1); }
-.post-detail__action-btn--liked { animation: like-pop 0.35s ease; }
-@keyframes like-pop { 0% { transform: scale(1); } 25% { transform: scale(1.3); } 50% { transform: scale(0.95); } 100% { transform: scale(1); } }
-.post-detail__likes { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
-.post-detail__caption { font-size: 14px; line-height: 1.5; margin-bottom: 6px; word-break: break-word; }
-.post-detail__caption-author { font-weight: 600; text-decoration: none; color: var(--color-text); margin-right: 4px; }
-.post-detail__caption-author:hover { text-decoration: underline; }
-.post-detail__time { font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; }
+.post-detail__container {
+  max-width: 600px;
+  margin: 0 auto;
+}
 
-.post-detail__comments { margin-top: 20px; }
-.post-detail__comments-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
-.post-detail__no-comments { font-size: 14px; color: var(--color-text-muted); text-align: center; padding: 24px 0; }
-.post-detail__comment { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--color-border); }
-.post-detail__comment:last-of-type { border-bottom: none; }
-.post-detail__comment-body { flex: 1; min-width: 0; }
-.post-detail__comment-text { font-size: 13px; line-height: 1.5; word-break: break-word; }
-.post-detail__comment-author { font-weight: 600; text-decoration: none; color: var(--color-text); margin-right: 4px; }
-.post-detail__comment-author:hover { text-decoration: underline; }
-.post-detail__comment-meta { display: flex; gap: 12px; margin-top: 4px; }
-.post-detail__comment-time { font-size: 11px; color: var(--color-text-muted); }
-.post-detail__comment-delete { font-size: 11px; color: var(--color-error); background: none; border: none; cursor: pointer; padding: 0; font-weight: 500; }
-.post-detail__comment-delete:hover { text-decoration: underline; }
-.post-detail__load-more { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px; margin: 12px 0; font-size: 13px; font-weight: 600; color: var(--color-accent); background: none; border: 1.5px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; transition: all var(--transition-fast); }
-.post-detail__load-more:hover:not(:disabled) { border-color: var(--color-accent); }
-.post-detail__load-more:disabled { opacity: 0.5; cursor: not-allowed; }
-.post-detail__add-comment { margin-top: 16px; padding-top: 8px; }
+.post-detail__loader {
+  display: flex;
+  justify-content: center;
+  padding: 80px 0;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.spinner--sm {
+  width: 18px;
+  height: 18px;
+  border-width: 2px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.post-detail__error {
+  text-align: center;
+  padding: 80px 24px;
+  color: var(--color-text-muted);
+}
+
+.post-detail__back-link {
+  display: inline-block;
+  margin-top: 12px;
+  color: var(--color-accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.post-detail__card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.post-detail__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+}
+
+.post-detail__author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.post-detail__author-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.post-detail__author-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.post-detail__author-username {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.post-detail__delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.post-detail__delete-btn:hover {
+  color: var(--color-error);
+  background: rgba(237,73,86,.08);
+}
+
+.post-detail__image-wrapper {
+  width: 100%;
+  background: var(--color-surface-alt);
+}
+
+.post-detail__image {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.post-detail__body {
+  padding: 14px 16px;
+}
+
+.post-detail__actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.post-detail__action-btn {
+  display: flex;
+  align-items: center;
+  color: var(--color-text);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  transition: transform var(--transition-fast);
+}
+
+.post-detail__action-btn:hover {
+  transform: scale(1.1);
+}
+
+.post-detail__action-btn--liked {
+  animation: like-pop 0.35s ease;
+}
+
+@keyframes like-pop {
+  0%   { transform: scale(1); }
+  25%  { transform: scale(1.3); }
+  50%  { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.post-detail__likes {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.post-detail__caption {
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 6px;
+  word-break: break-word;
+}
+
+.post-detail__caption-author {
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--color-text);
+  margin-right: 4px;
+}
+
+.post-detail__caption-author:hover {
+  text-decoration: underline;
+}
+
+.post-detail__time {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.post-detail__comments {
+  margin-top: 20px;
+}
+
+.post-detail__comments-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.post-detail__no-comments {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 24px 0;
+}
+
+.post-detail__comment {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.post-detail__comment:last-of-type {
+  border-bottom: none;
+}
+
+.post-detail__comment-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.post-detail__comment-text {
+  font-size: 13px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.post-detail__comment-author {
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--color-text);
+  margin-right: 4px;
+}
+
+.post-detail__comment-author:hover {
+  text-decoration: underline;
+}
+
+.post-detail__comment-meta {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.post-detail__comment-time {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.post-detail__comment-delete {
+  font-size: 11px;
+  color: var(--color-error);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-weight: 500;
+}
+
+.post-detail__comment-delete:hover {
+  text-decoration: underline;
+}
+
+.post-detail__load-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px;
+  margin: 12px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-accent);
+  background: none;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.post-detail__load-more:hover:not(:disabled) {
+  border-color: var(--color-accent);
+}
+
+.post-detail__load-more:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.post-detail__add-comment {
+  margin-top: 16px;
+  padding-top: 8px;
+}
 </style>

@@ -1,9 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import api, { TOKEN_KEY } from '@/services/api'
-
-// Laravel API Resources envolvem usuário em { data: {...} }
-// Esta função normaliza os dois formatos possíveis
 function normalizeUser(raw) {
   return raw?.data ?? raw ?? null
 }
@@ -28,7 +25,6 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function login(credentials) {
     const { data } = await api.post('/auth/login', credentials)
-    // Suporta: { access_token, user } ou { data: { access_token, user } }
     const payload = data?.data ?? data
     setSession(payload.access_token, payload.user)
   }
@@ -43,7 +39,6 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       await api.post('/auth/logout')
     } catch {
-      // Ignora erro — token pode já ter expirado
     } finally {
       clearSession()
     }
@@ -51,7 +46,6 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function fetchMe() {
     const { data } = await api.get('/auth/me')
-    // GET /auth/me retorna UserResource → { data: {...} } ou direto {...}
     user.value = normalizeUser(data)
   }
 

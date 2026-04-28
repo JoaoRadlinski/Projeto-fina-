@@ -1,5 +1,4 @@
 import api from './api.js'
-
 export const commentsService = {
   getByPost(postId) {
     return api.get(`/posts/${postId}/comments`)

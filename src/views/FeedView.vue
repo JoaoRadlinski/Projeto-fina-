@@ -1,17 +1,17 @@
 <template>
   <div class="feed-view">
 
-    <!-- ── Coluna central: posts ──────────────────────────────────────── -->
+
     <div class="feed-col">
       <h1 class="sr-only">Feed</h1>
 
-      <!-- Loading inicial -->
+
       <div v-if="feedStore.loading && feedStore.orderedPosts.length === 0" class="feed-loader">
         <div class="spinner"></div>
         <p>Carregando seu feed…</p>
       </div>
 
-      <!-- Feed vazio -->
+
       <div v-else-if="!feedStore.loading && feedStore.orderedPosts.length === 0" class="feed-empty">
         <div class="feed-empty__icon">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -33,7 +33,7 @@
         </div>
       </div>
 
-      <!-- Posts -->
+
       <template v-else>
         <PostCard
           v-for="post in feedStore.orderedPosts"
@@ -41,7 +41,7 @@
           :post="post"
         />
 
-        <!-- Botão carregar mais -->
+
         <div v-if="feedStore.hasMore" class="feed-load-more">
           <button
             class="feed-load-more__btn"
@@ -55,7 +55,7 @@
       </template>
     </div>
 
-    <!-- ── Coluna direita: sugestões (só desktop largo) ───────────────── -->
+
     <SuggestionsPanel class="feed-suggestions" />
 
   </div>
@@ -75,7 +75,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* ── Layout de duas colunas ───────────────────────────────────────────── */
+
 .feed-view {
   display: flex;
   gap: 28px;
@@ -85,22 +85,20 @@ onMounted(() => {
   align-items: flex-start;
 }
 
-/* ── Coluna de posts ──────────────────────────────────────────────────── */
 .feed-col {
   flex: 1;
   max-width: 470px;
   min-width: 0;
 }
 
-/* ── Coluna de sugestões ──────────────────────────────────────────────── */
 .feed-suggestions {
   display: none;
+  margin-left: 80px;
 }
 @media (min-width: 960px) {
   .feed-suggestions { display: block; }
 }
 
-/* ── Loading inicial ─────────────────────────────────────────────────── */
 .feed-loader {
   display: flex;
   flex-direction: column;
@@ -123,7 +121,6 @@ onMounted(() => {
 .spinner--sm { width: 18px; height: 18px; border-width: 2px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── Feed vazio ─────────────────────────────────────────────────────── */
 .feed-empty {
   display: flex;
   flex-direction: column;
@@ -166,7 +163,6 @@ onMounted(() => {
   border: 1px solid var(--color-border);
 }
 
-/* ── Botão carregar mais ─────────────────────────────────────────────── */
 .feed-load-more {
   display: flex;
   justify-content: center;

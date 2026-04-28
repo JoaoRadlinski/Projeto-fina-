@@ -1,27 +1,27 @@
 <template>
   <div class="auth">
 
-    <!-- ── Painel esquerdo: imagem ─────────────────────────────────────── -->
-    <div class="auth__image-panel">
+
+    <div class="auth__painel-imagem">
       <div class="image-overlay"></div>
-      <div class="image-content">
+      <div class="image-conteudo">
         <div class="image-logo">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white"
-               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
           </svg>
-          <span>InstaClone</span>
+          <span>Insta</span>
         </div>
-        <div class="image-quote">
+        <div class="comentario_imagem">
           <h2>Capture cada<br>momento</h2>
           <p>Compartilhe sua história e conecte-se com as pessoas que você ama.</p>
         </div>
       </div>
     </div>
 
-    <!-- ── Painel direito: formulário ─────────────────────────────────── -->
+
     <div class="auth__form-panel">
       <div class="auth-form">
 
@@ -31,33 +31,32 @@
         </p>
 
         <div class="auth-form__body">
-          <div class="brand">
-            <div class="brand__icon">
+          <div class="logo">
+            <div class="logo__icon">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white"
-                   stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
               </svg>
             </div>
-            <h1 class="brand__name">InstaClone</h1>
-            <p class="brand__tagline">Bem-vindo de volta</p>
+            <h1 class="logo__nome">InstaClone</h1>
+            <p class="logo__tagline">Bem-vindo de volta</p>
           </div>
 
           <form @submit.prevent="handleLogin">
 
-            <!-- Campo: E-mail -->
-            <div class="field">
-              <span class="field__icon">
+            <div class="campo">
+              <span class="campo__icon">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                  <polyline points="22,6 12,13 2,6"/>
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <polyline points="22,6 12,13 2,6" />
                 </svg>
               </span>
               <input
                 v-model="form.email"
-                class="field__input"
+                class="campo__input"
                 type="email"
                 placeholder="Seu e-mail"
                 autocomplete="email"
@@ -66,49 +65,48 @@
               />
             </div>
 
-            <!-- Campo: Senha -->
-            <div class="field">
-              <span class="field__icon">
+
+            <div class="campo">
+              <span class="campo__icon">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                 </svg>
               </span>
               <input
                 v-model="form.password"
-                class="field__input"
+                class="campo__input"
                 :type="showPass ? 'text' : 'password'"
                 placeholder="Senha"
                 autocomplete="current-password"
                 :disabled="loading"
                 required
               />
-              <button type="button" class="field__eye-toggle" @click="showPass = !showPass">
+              <button type="button" class="campo__eye-toggle" @click="showPass = !showPass">
                 <svg v-if="!showPass" width="15" height="15" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                  <circle cx="12" cy="12" r="3"/>
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
                 </svg>
                 <svg v-else width="15" height="15" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-                  <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-                  <line x1="1" y1="1" x2="23" y2="23"/>
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+                  <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+                  <line x1="1" y1="1" x2="23" y2="23" />
                 </svg>
               </button>
             </div>
 
-            <!-- Erro -->
             <p v-if="erro" class="error-alert">{{ erro }}</p>
 
-            <!-- Botão submit -->
             <button class="submit-btn" type="submit" :disabled="loading">
               <span v-if="!loading">Entrar</span>
               <span v-else class="loading-spinner"></span>
             </button>
           </form>
         </div>
+
       </div>
     </div>
 
@@ -121,22 +119,19 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.js'
 import { extractErrorMessage } from '@/services/api.js'
 
-const router   = useRouter()
-const auth     = useAuthStore()
-const loading  = ref(false)
-const erro     = ref('')
+const router = useRouter()
+const auth = useAuthStore()
+const loading = ref(false)
+const erro = ref('')
 const showPass = ref(false)
 
-// Payload enviado ao backend: POST /auth/login → { email, password }
 const form = reactive({ email: '', password: '' })
 
-// Mapa de erros em inglês do Laravel → mensagens em português
 const errosPT = {
   'These credentials do not match our records.': 'E-mail ou senha incorretos.',
   'The password is incorrect.': 'Senha incorreta.',
   'The provided credentials are incorrect.': 'E-mail ou senha incorretos.',
-  'Too many login attempts. Please try again in':
-    'Muitas tentativas. Aguarde alguns minutos e tente novamente.',
+  'Too many login attempts. Please try again in': 'Muitas tentativas. Aguarde alguns minutos e tente novamente.',
   'The email field is required.': 'O campo e-mail é obrigatório.',
   'The email must be a valid email address.': 'Informe um e-mail válido.',
   'The password field is required.': 'O campo senha é obrigatório.',
@@ -146,7 +141,6 @@ const errosPT = {
 
 function traduzirErro(err) {
   const raw = extractErrorMessage(err, 'Erro ao entrar. Tente novamente.')
-  // Verifica correspondência parcial para cobrir mensagens com sufixo (ex: "Too many... in X seconds")
   for (const [en, pt] of Object.entries(errosPT)) {
     if (raw.startsWith(en) || raw === en) return pt
   }
@@ -154,10 +148,9 @@ function traduzirErro(err) {
 }
 
 async function handleLogin() {
-  erro.value    = ''
+  erro.value = ''
   loading.value = true
   try {
-    // Envia { email, password } — nunca username
     await auth.login({ email: form.email, password: form.password })
     router.push({ name: 'feed' })
   } catch (err) {
@@ -169,15 +162,13 @@ async function handleLogin() {
 </script>
 
 <style scoped>
-/* ── Layout base ──────────────────────────────────────────────────────── */
 .auth {
   display: flex;
   width: 100%;
   min-height: 100vh;
 }
 
-/* ── Painel esquerdo: imagem ──────────────────────────────────────────── */
-.auth__image-panel {
+.auth__painel-imagem {
   flex: 1;
   position: relative;
   overflow: hidden;
@@ -188,26 +179,20 @@ async function handleLogin() {
   align-items: stretch;
 }
 
-/* Esconde o painel de imagem em mobile */
 @media (max-width: 767px) {
-  .auth__image-panel { display: none; }
+  .auth__painel-imagem {
+    display: none;
+  }
 }
 
-/* Overlay escuro com gradiente para legibilidade do texto */
 .image-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.25) 0%,
-    rgba(0, 0, 0, 0.15) 40%,
-    rgba(0, 0, 0, 0.7)  100%
-  );
+  background: linear-gradient(to bottom, rgba(0,0,0,.25) 0%, rgba(0,0,0,.15) 40%, rgba(0,0,0,.7) 100%);
   z-index: 1;
 }
 
-/* Conteúdo posicionado sobre a imagem */
-.image-content {
+.image-conteudo {
   position: relative;
   z-index: 2;
   display: flex;
@@ -218,7 +203,6 @@ async function handleLogin() {
   color: #fff;
 }
 
-/* Logo no canto superior esquerdo */
 .image-logo {
   display: flex;
   align-items: center;
@@ -226,30 +210,28 @@ async function handleLogin() {
   font-size: 20px;
   font-weight: 700;
   letter-spacing: 0.5px;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  text-shadow: 0 1px 4px rgba(0,0,0,.4);
 }
 
-/* Texto de citação na parte inferior */
-.image-quote {
+.comentario_imagem {
   max-width: 340px;
 }
 
-.image-quote h2 {
+.comentario_imagem h2 {
   font-size: 36px;
   font-weight: 800;
   line-height: 1.15;
   margin-bottom: 12px;
-  text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+  text-shadow: 0 2px 12px rgba(0,0,0,.5);
 }
 
-.image-quote p {
+.comentario_imagem p {
   font-size: 15px;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255,255,255,.75);
   line-height: 1.7;
-  text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+  text-shadow: 0 1px 6px rgba(0,0,0,.4);
 }
 
-/* ── Painel direito: formulário ───────────────────────────────────────── */
 .auth__form-panel {
   width: 480px;
   flex-shrink: 0;
@@ -286,7 +268,10 @@ async function handleLogin() {
   margin-left: 4px;
   text-decoration: none;
 }
-.auth-form__nav a:hover { opacity: .8; }
+
+.auth-form__nav a:hover {
+  opacity: .8;
+}
 
 .auth-form__body {
   flex: 1;
@@ -296,10 +281,11 @@ async function handleLogin() {
   padding: 16px 0 48px;
 }
 
-/* ── Marca ────────────────────────────────────────────────────────────── */
-.brand { margin-bottom: 32px; }
+.logo {
+  margin-bottom: 32px;
+}
 
-.brand__icon {
+.logo__icon {
   width: 54px;
   height: 54px;
   border-radius: 18px;
@@ -308,10 +294,10 @@ async function handleLogin() {
   align-items: center;
   justify-content: center;
   margin-bottom: 16px;
-  box-shadow: 0 8px 28px rgba(220, 39, 67, 0.32);
+  box-shadow: 0 8px 28px rgba(220,39,67,.32);
 }
 
-.brand__name {
+.logo__nome {
   font-size: 34px;
   font-family: 'Billabong', 'Grand Hotel', cursive;
   letter-spacing: 1.5px;
@@ -320,18 +306,17 @@ async function handleLogin() {
   line-height: 1;
 }
 
-.brand__tagline {
+.logo__tagline {
   font-size: 14px;
   color: var(--color-text-muted);
 }
 
-/* ── Campos de formulário ─────────────────────────────────────────────── */
-.field {
+.campo {
   position: relative;
   margin-bottom: 12px;
 }
 
-.field__icon {
+.campo__icon {
   position: absolute;
   left: 14px;
   top: 50%;
@@ -342,9 +327,12 @@ async function handleLogin() {
   pointer-events: none;
   transition: color .15s;
 }
-.field:focus-within .field__icon { color: var(--color-accent); }
 
-.field__input {
+.campo:focus-within .campo__icon {
+  color: var(--color-accent);
+}
+
+.campo__input {
   display: block;
   width: 100%;
   padding: 14px 44px 14px 42px;
@@ -356,15 +344,23 @@ async function handleLogin() {
   outline: none;
   transition: border-color .15s, background .15s, box-shadow .15s;
 }
-.field__input:focus {
+
+.campo__input:focus {
   background: var(--color-surface);
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(225, 48, 108, .1);
+  box-shadow: 0 0 0 3px rgba(225,48,108,.1);
 }
-.field__input::placeholder { color: var(--color-text-muted); }
-.field__input:disabled { opacity: .6; cursor: not-allowed; }
 
-.field__eye-toggle {
+.campo__input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.campo__input:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.campo__eye-toggle {
   position: absolute;
   right: 12px;
   top: 50%;
@@ -375,20 +371,21 @@ async function handleLogin() {
   padding: 4px;
   transition: color .15s;
 }
-.field__eye-toggle:hover { color: var(--color-text); }
 
-/* ── Mensagem de erro ─────────────────────────────────────────────────── */
+.campo__eye-toggle:hover {
+  color: var(--color-text);
+}
+
 .error-alert {
   font-size: 12.5px;
   color: var(--color-error);
   margin-bottom: 12px;
   padding: 10px 14px;
-  background: rgba(237, 73, 86, .08);
+  background: rgba(237,73,86,.08);
   border-radius: 10px;
   border-left: 3px solid var(--color-error);
 }
 
-/* ── Botão de envio ───────────────────────────────────────────────────── */
 .submit-btn {
   width: 100%;
   padding: 14px;
@@ -402,28 +399,39 @@ async function handleLogin() {
   cursor: pointer;
   letter-spacing: 0.3px;
   transition: background-position .5s ease, box-shadow .2s, opacity .15s, transform .1s;
-  box-shadow: 0 4px 20px rgba(220, 39, 67, .35);
+  box-shadow: 0 4px 20px rgba(220,39,67,.35);
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 50px;
 }
+
 .submit-btn:hover:not(:disabled) {
   background-position: right center;
-  box-shadow: 0 8px 30px rgba(220, 39, 67, .45);
+  box-shadow: 0 8px 30px rgba(220,39,67,.45);
   transform: translateY(-1px);
 }
-.submit-btn:active:not(:disabled) { transform: translateY(0); }
-.submit-btn:disabled { opacity: .55; cursor: not-allowed; }
+
+.submit-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submit-btn:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
 
 .loading-spinner {
   display: inline-block;
   width: 20px;
   height: 20px;
-  border: 2.5px solid rgba(255, 255, 255, .3);
+  border: 2.5px solid rgba(255,255,255,.3);
   border-top-color: #fff;
   border-radius: 50%;
   animation: spin .7s linear infinite;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 </style>

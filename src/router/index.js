@@ -1,15 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { TOKEN_KEY } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
-
 const routes = [
-  // ── Redireciona raiz para /feed ───────────────────────────────────────
   {
     path: '/',
     redirect: '/feed',
   },
-
-  // ── Rotas de visitante (AuthLayout) ───────────────────────────────────
   {
     path: '/',
     component: () => import('@/layouts/AuthLayout.vue'),
@@ -27,8 +23,6 @@ const routes = [
       },
     ],
   },
-
-  // ── Rotas autenticadas (AppLayout) ────────────────────────────────────
   {
     path: '/',
     component: () => import('@/layouts/AppLayout.vue'),
@@ -71,8 +65,6 @@ const routes = [
       },
     ],
   },
-
-  // ── 404 curinga ───────────────────────────────────────────────────────
   {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
@@ -84,19 +76,14 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
 })
-
-// ── Guards globais ────────────────────────────────────────────────────────
 router.beforeEach(async (to) => {
   const hasToken = !!localStorage.getItem(TOKEN_KEY)
-
   if (to.meta.requiresAuth && !hasToken) {
     return { name: 'login' }
   }
-
   if (to.meta.requiresGuest && hasToken) {
     return { name: 'feed' }
   }
-
   if (hasToken) {
     const auth = useAuthStore()
     if (!auth.user) {
@@ -108,5 +95,4 @@ router.beforeEach(async (to) => {
     }
   }
 })
-
 export default router

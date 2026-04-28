@@ -1,10 +1,7 @@
 <template>
   <div class="discover-view">
-
-    <!-- ── Cabeçalho + barra de busca ─────────────────────────────────── -->
     <div class="discover-header">
       <h1 class="discover-header__title">Explorar</h1>
-
       <div class="search-bar" :class="{ 'search-bar--active': searchFocused }">
         <span class="search-bar__icon">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
@@ -26,7 +23,7 @@
           @input="onInput"
         />
 
-        <!-- Botão limpar -->
+
         <button
           v-if="termo"
           class="search-bar__clear"
@@ -42,16 +39,16 @@
       </div>
     </div>
 
-    <!-- ── Corpo ───────────────────────────────────────────────────────── -->
+
     <div class="discover-body">
 
-      <!-- Estado de loading (inicial ou busca) -->
+
       <div v-if="loading" class="state-empty">
         <div class="spinner"></div>
         <p>{{ termo ? 'Buscando…' : 'Carregando pessoas…' }}</p>
       </div>
 
-      <!-- Nenhum resultado para a busca -->
+
       <div v-else-if="termo && listaExibida.length === 0" class="state-empty">
         <div class="state-empty__icon">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -64,7 +61,7 @@
         <p class="state-empty__term">"{{ termo }}"</p>
       </div>
 
-      <!-- Sem usuários não seguidos -->
+
       <div v-else-if="!termo && listaExibida.length === 0 && !loading" class="state-empty">
         <div class="state-empty__icon">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -76,10 +73,10 @@
         <p class="state-empty__title">Você já segue todo mundo!</p>
       </div>
 
-      <!-- Lista de usuários -->
+
       <template v-else>
 
-        <!-- Rótulo contextual -->
+
         <div class="list-header">
           <span v-if="termo" class="list-header__label">
             Resultados para <strong>"{{ termo }}"</strong>
@@ -91,7 +88,7 @@
           </span>
         </div>
 
-        <!-- Cards -->
+
         <div class="user-list">
           <UserCard
             v-for="user in listaExibida"
@@ -116,44 +113,35 @@ import UserCard       from '@/components/discover/UserCard.vue'
 
 const auth = useAuthStore()
 
-// ── Estado ─────────────────────────────────────────────────────────────
 const termo         = ref('')
 const searchFocused = ref(false)
 const loading       = ref(false)
 
-// Todos os usuários não seguidos (carregados na inicialização)
 const todosNaoSeguidos = ref([])
 
-// Resultados da busca via API (quando há termo de busca)
 const resultadosBusca  = ref([])
 
-// IDs dos usuários que o usuário atual já segue
 const followingIds     = ref(new Set())
 
-// Timeout do debounce de busca
 let buscaTimeout = null
 
-// ── Lista exibida ───────────────────────────────────────────────────────
-// Se não há termo → todos os não seguidos
-// Se há termo → resultados da busca filtrados para não incluir o próprio usuário
 const listaExibida = computed(() => {
   if (!termo.value.trim()) return todosNaoSeguidos.value
 
-  // Filtra o próprio usuário dos resultados
+
   return resultadosBusca.value.filter(u => u.id !== auth.user?.id)
 })
 
-// ── Inicialização ───────────────────────────────────────────────────────
 onMounted(async () => {
   loading.value = true
   try {
-    // Carrega em paralelo: usuários não seguidos + quem já sigo
+
     const [sugResp, followResp] = await Promise.allSettled([
       api.get('/users/suggestions'),
       auth.user ? api.get(`/users/${auth.user.id}/following`) : Promise.resolve(null),
     ])
 
-    // Usuários não seguidos
+
     if (sugResp.status === 'fulfilled') {
       const raw = sugResp.value.data?.data ?? sugResp.value.data ?? []
       todosNaoSeguidos.value = Array.isArray(raw)
@@ -161,7 +149,7 @@ onMounted(async () => {
         : []
     }
 
-    // IDs de quem já sigo
+
     if (followResp.status === 'fulfilled' && followResp.value) {
       const raw = followResp.value.data?.data ?? followResp.value.data ?? []
       followingIds.value = new Set(Array.isArray(raw) ? raw.map(u => u.id) : [])
@@ -173,7 +161,6 @@ onMounted(async () => {
   }
 })
 
-// ── Busca com debounce ──────────────────────────────────────────────────
 function onInput() {
   clearTimeout(buscaTimeout)
   resultadosBusca.value = []
@@ -201,11 +188,10 @@ function limpar() {
   resultadosBusca.value = []
 }
 
-// ── Follow / Unfollow ───────────────────────────────────────────────────
 function onFollowToggled(userId, isNowFollowing) {
   if (isNowFollowing) {
     followingIds.value = new Set([...followingIds.value, userId])
-    // Remove da lista de não-seguidos ao seguir
+
     todosNaoSeguidos.value = todosNaoSeguidos.value.filter(u => u.id !== userId)
   } else {
     followingIds.value = new Set([...followingIds.value].filter(id => id !== userId))
@@ -214,14 +200,13 @@ function onFollowToggled(userId, isNowFollowing) {
 </script>
 
 <style scoped>
-/* ── Container principal ──────────────────────────────────────────────── */
+
 .discover-view {
   max-width: 620px;
   margin: 0 auto;
   padding-bottom: 40px;
 }
 
-/* ── Header (título + search) ─────────────────────────────────────────── */
 .discover-header {
   position: sticky;
   top: 0;
@@ -238,7 +223,6 @@ function onFollowToggled(userId, isNowFollowing) {
   color: var(--color-text);
 }
 
-/* ── Barra de busca ───────────────────────────────────────────────────── */
 .search-bar {
   display: flex;
   align-items: center;
@@ -299,12 +283,10 @@ function onFollowToggled(userId, isNowFollowing) {
   background: var(--color-surface-alt);
 }
 
-/* ── Body ─────────────────────────────────────────────────────────────── */
 .discover-body {
   padding: 12px 8px 0;
 }
 
-/* ── Rótulo da lista ──────────────────────────────────────────────────── */
 .list-header {
   padding: 8px 12px 4px;
 }
@@ -326,7 +308,6 @@ function onFollowToggled(userId, isNowFollowing) {
   margin-left: 4px;
 }
 
-/* ── Lista de usuários ────────────────────────────────────────────────── */
 .user-list {
   display: flex;
   flex-direction: column;
@@ -334,7 +315,6 @@ function onFollowToggled(userId, isNowFollowing) {
   margin-top: 4px;
 }
 
-/* ── Estado vazio / loading ───────────────────────────────────────────── */
 .state-empty {
   display: flex;
   flex-direction: column;
@@ -370,7 +350,6 @@ function onFollowToggled(userId, isNowFollowing) {
   color: var(--color-text-muted);
 }
 
-/* ── Spinner ──────────────────────────────────────────────────────────── */
 .spinner {
   width: 28px;
   height: 28px;

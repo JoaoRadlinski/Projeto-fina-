@@ -50,7 +50,6 @@ export function useImageUpload() {
     erro.value = ''
   }
 
-  // Libera o object URL quando o componente for destruido
   onUnmounted(revogarPreview)
 
   return {
